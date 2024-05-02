@@ -1,0 +1,85 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h1>Add Food Item</h1>
+    <form method="post" action="{% url 'nutrition:add_food' %}" style="display: inline-block; text-align: left;">
+        {% csrf_token %}
+        <div style="margin-bottom: 10px;">
+            <label for="food-name">Food Name:</label>
+            <input type="text" id="food-name" name="name" autocomplete="off" placeholder="Start typing a food name...">
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <input type="hidden" id="fdc-id" name="fdc-id">
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="serving-size">Serving Size (g):</label>
+            <input type="number" id="serving-size" name="serving_size" value="100">
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label>Calories:</label>
+            <input type="number" name="calories" id="calories">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label>Protein (g):</label>
+            <input type="number" name="protein" id="protein">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label>Carbs (g):</label>
+            <input type="number" name="carbs" id="carbs">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label>Fats (g):</label>
+            <input type="number" name="fats" id="fats">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label>Servings:</label>
+            <input type="number" name="servings" id="servings">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label>Date:</label>
+            <input type="date" name="date" id="date" value="{{ date|date:'Y-m-d' }}">
+        </div>
+        <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Add Food Item</button>
+    </form>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+$(document).ready(function() {
+    $("#food-name").autocomplete({
+        source: function(request, response) {
+            $.getJSON("/nutrition/autocomplete/", { term: request.term }, response);
+        },
+        minLength: 2,
+        select: function(event, ui) {
+            $('#fdc-id').val(ui.item.value);
+            var detailsUrl = `https://api.nal.usda.gov/fdc/v1/food/${ui.item.value}?api_key=zYxRawipSZYiv1a8XHQgVwHDk3RNvZHj5jD02XVi`;
+
+            $.getJSON(detailsUrl, function(data) {
+                var calories = data.foodNutrients.find(n => n.nutrient.number === "208")?.amount || 0;
+                var protein = data.foodNutrients.find(n => n.nutrient.number === "203")?.amount || 0;
+                var carbs = data.foodNutrients.find(n => n.nutrient.number === "205")?.amount || 0;
+                var fats = data.foodNutrients.find(n => n.nutrient.number === "204")?.amount || 0;
+
+                $('#calories').val(calories);
+                $('#protein').val(protein);
+                $('#carbs').val(carbs);
+                $('#fats').val(fats);
+            });
+
+            $('#food-name').val(ui.item.label);
+            event.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

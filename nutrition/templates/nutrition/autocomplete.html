@@ -1,0 +1,23 @@
+<input type="text" id="food-search" name="food-search">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+
+<script>
+$(function() {
+  $("#food-search").autocomplete({
+    source: "/nutrition/autocomplete/",
+    minLength: 2,
+    select: function(event, ui) {
+      console.log(ui.item.value);
+      $('#name-field').val(ui.item.label);
+    },
+    response: function(event, ui) {
+      if (!ui.content.length) {
+        var noResult = { value:"",label:"No results found" };
+        ui.content.push(noResult);
+      }
+    }
+  });
+});
+</script>

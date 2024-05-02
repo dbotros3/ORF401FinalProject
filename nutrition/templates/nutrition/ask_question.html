@@ -1,0 +1,27 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div style="text-align: center; display: flex; justify-content: flex-start; align-items: center; height: 100vh; flex-direction: column; padding-top: 5%;">
+    <h1>Ask About Food</h1>
+    <form method="post" style="width: 50%; min-width: 300px;">
+        {% csrf_token %}
+        <label for="question" style="display: block; margin-bottom: 10px;">What would you like to know about food?</label>
+        <textarea name="question" id="question" style="padding: 10px; width: 100%; height: 50px; resize: vertical; margin-bottom: 20px;"></textarea>
+        <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Ask</button>
+    </form>
+
+    {% if answer %}
+        <div class="alert alert-success" style="text-align: left; width: 50%; min-width: 300px;">
+            <ul>
+            {% for item in answer %}
+                {% if item %}
+                    <li>{{ item }}</li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        </div>
+    {% elif error %}
+        <div class="alert alert-danger" style="width: 50%; min-width: 300px;">{{ error }}</div>
+    {% endif %}
+</div>
+{% endblock %}
