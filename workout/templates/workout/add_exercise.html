@@ -1,0 +1,42 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h2>Add Exercise</h2>
+    <form method="post" style="display: inline-block; text-align: left;">
+        {% csrf_token %}
+        <label for="exercise">Choose an exercise:</label>
+        <select id="exercise" name="exercise">
+            {% for exercise in predefined_exercises %}
+            <option value="{{ exercise.id }}">{{ exercise.name }}</option>
+            {% endfor %}
+            <option value="custom">Custom exercise</option>
+        </select>
+
+        <div id="customExercise" style="display:none;">
+            <label for="custom_name">Custom Exercise Name:</label>
+            <input type="text" id="custom_name" name="custom_name">
+
+            <label for="custom_type">Type:</label>
+            <select id="custom_type" name="custom_type">
+                <option value="ST">Strength Training</option>
+                <option value="CA">Cardio</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn">Add Exercise</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('exercise').addEventListener('change', function() {
+        var display = this.value == 'custom' ? 'block' : 'none';
+        document.getElementById('customExercise').style.display = display;
+    });
+</script>
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+{% endblock %}

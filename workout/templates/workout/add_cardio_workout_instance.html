@@ -1,0 +1,10 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<h2>Add Cardio Workout Instance</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add Workout Instance</button>
+</form>
+{% endblock %}

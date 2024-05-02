@@ -1,0 +1,26 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+<div style="padding: 20px;">
+    <h2 style="text-align: center;">Your Exercises</h2>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px;">
+        {% for exercise in exercises %}
+        <div class="exercise-card" style="flex-basis: calc(25% - 20px); background-color: #f4f4f9; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 15px; text-align: center;">
+            <a href="{% url 'workout:exercise_detail' exercise.id %}" style="text-decoration: none; color: #333;">
+                <h3>{{ exercise.name }}</h3>
+                <p>{{ exercise.get_exercise_type_display }}</p>
+            </a>
+        </div>
+        {% empty %}
+        <p style="text-align: center;">No exercises added yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+</script>
+{% endblock %}

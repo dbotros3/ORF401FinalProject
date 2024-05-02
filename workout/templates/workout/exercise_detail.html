@@ -1,0 +1,127 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <div class="container" style="padding: 20px;">
+    <h2>{{ exercise.name }} - {{ exercise.get_exercise_type_display }}</h2>
+    <p>{{ exercise.description }}</p>
+
+    <div class="instances" style="display: flex; flex-wrap: wrap;">
+        {% for instance in instances %}
+            <div style="flex: 0 0 calc(33.33% - 20px); margin: 10px;">
+                <p><strong>Date: {{ instance.date }}</strong></p>
+                {% if exercise.exercise_type == 'CA' %}
+                    <p>Distance: {{ instance.distance }} mi</p>
+                    <p>Duration: {{ instance.duration }} min</p>
+                    <p>Heart Rate: {{ instance.average_heart_rate }} bpm</p>
+                {% elif exercise.exercise_type == 'ST' %}
+                    <p>Sets: {{ instance.sets }}</p>
+                    <p>Reps: {{ instance.reps }}</p>
+                    <p>Weight: {{ instance.weight }} lbs</p>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>No instances recorded.</p>
+        {% endfor %}
+    </div>
+</div>
+
+    <div class="add-instance" style="background: #f4f4f9; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h4>Add New Instance:</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {{ form.errors }}
+                </div>
+            {% endif %}
+            <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Submit</button>
+        </form>
+    </div>
+
+
+    {% if exercise.exercise_type == 'CA' %}
+        <canvas id="cardioChart"></canvas>
+    {% elif exercise.exercise_type == 'ST' %}
+        <canvas id="strengthChart"></canvas>
+    {% endif %}
+
+    <div id="dates" style="display:none;">{{ dates|json_script:"dates" }}</div>
+    <div id="durations" style="display:none;">{{ durations|json_script:"durations" }}</div>
+    <div id="distances" style="display:none;">{{ distances|json_script:"distances" }}</div>
+    <div id="average_heart_rate" style="display:none;">{{ average_heart_rate|json_script:"average_heart_rate" }}</div>
+    <div id="weights" style="display:none;">{{ weights|json_script:"weights" }}</div>
+    <div id="reps" style="display:none;">{{ reps|json_script:"reps" }}</div>
+    <div id="sets" style="display:none;">{{ sets|json_script:"sets" }}</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var dates = JSON.parse(document.getElementById('dates').textContent);
+        if (document.getElementById('cardioChart')) {
+            var durations = JSON.parse(document.getElementById('durations').textContent);
+            var distances = JSON.parse(document.getElementById('distances').textContent);
+            var average_heart_rate = JSON.parse(document.getElementById('average_heart_rate').textContent);
+            var ctx = document.getElementById('cardioChart').getContext('2d');
+            var cardioChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Duration',
+                        data: durations,
+                        backgroundColor: 'rgb(54, 162, 235)',
+                    }, {
+                        label: 'Distance',
+                        data: distances,
+                        backgroundColor: 'rgb(153, 102, 255)',
+                    },  {
+                        label: 'Average Heart Rate',
+                        data: average_heart_rate,
+                        backgroundColor: 'rgb(255, 159, 64)',
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        if (document.getElementById('strengthChart')) {
+            var weights = JSON.parse(document.getElementById('weights').textContent);
+            var reps = JSON.parse(document.getElementById('reps').textContent);
+            var sets = JSON.parse(document.getElementById('sets').textContent);
+            var ctx = document.getElementById('strengthChart').getContext('2d');
+            var strengthChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Weights',
+                        data: weights,
+                        backgroundColor: 'rgb(54, 162, 235)'
+                    }, {
+                        label: 'Reps',
+                        data: reps,
+                        backgroundColor: 'rgb(153, 102, 255)'
+                    }, {
+                        label: 'Sets',
+                        data: sets,
+                        backgroundColor: 'rgb(255, 159, 64)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    });
+    </script>
+{% endblock %}
